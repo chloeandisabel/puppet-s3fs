@@ -8,14 +8,14 @@
   "license": "",
   "version": "0.0.1",
   "checksums": {
-    "manifests/params.pp": "75fe7fccc8605f816c449bcc2cc7d250",
-    "manifests/init.pp": "19984ff8e989156efdb025d4452c2374",
+    "README": "d1801d2c98b6ad4155814d93f568f085",
+    "manifests/mount.pp": "2ad560421b8aad6e53a9a4c34c73250a",
     "spec/spec.opts": "a600ded995d948e393fbe2320ba8e51c",
     "Modulefile": "f4564637a17128665dd9eceeecbd5329",
-    "README": "d1801d2c98b6ad4155814d93f568f085",
-    "spec/spec_helper.rb": "ca19ec4f451ebc7fdb035b52eae6e909",
     "tests/init.pp": "65e7b5eaaad12bc2a54d4ec3cb1b827b",
-    "manifests/mount.pp": "2ad560421b8aad6e53a9a4c34c73250a"
+    "manifests/params.pp": "75fe7fccc8605f816c449bcc2cc7d250",
+    "manifests/init.pp": "19984ff8e989156efdb025d4452c2374",
+    "spec/spec_helper.rb": "ca19ec4f451ebc7fdb035b52eae6e909"
   },
   "project_page": "",
   "name": "Vlad-s3fs",
