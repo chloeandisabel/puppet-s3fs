@@ -26,7 +26,6 @@
 #
 class s3fs {
 
-  require common::repos
   require s3fs::params
 
   $aws_access_key_id     = hiera('aws_access_key_id')
