@@ -2,8 +2,6 @@ define s3fs::mount ($bucket,
                     $mount_point,
                     $s3url = 'https://s3.amazonaws.com',
                     $default_acl = 'private',
-                    $user = 'root',
-                    $group = 'root',
                     $uid = '0',
                     $gid = '0'
                     ) {
@@ -11,9 +9,10 @@ define s3fs::mount ($bucket,
   require s3fs
 
   file {$mount_point:
-    ensure => directory,
-    owner  => $user,
-    group  => $group,
+    ensure  => directory,
+    recurse => true,
+    owner   => $uid,
+    group   => $gid,
   }
 
   mount{$mount_point:

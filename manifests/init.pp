@@ -14,8 +14,6 @@
 #  s3fs::mount {'Testing':
 #    bucket      => 'testvgh1',
 #    mount_point => '/srv/testvgh1',
-#    user        => 'vlad',
-#    group       => 'vlad',
 #    uid         => '1001',
 #    gid         => '1001',
 #  }
