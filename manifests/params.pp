@@ -1,7 +1,7 @@
 class s3fs::params {
 
   $credentials_file = '/etc/passwd-s3fs'
-  $source_dir       = '/root'
+  $source_dir       = '/tmp'
   $version          = '1.61'
   $download_url     = 'http://s3fs.googlecode.com/files'
 
