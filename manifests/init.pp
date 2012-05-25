@@ -4,35 +4,38 @@
 #
 # Parameters:
 #
+#  [*ensure*]                - 'present',
+#  [*s3fs_package*]          - $s3fs::params::s3fs_package,
+#  [*download_dir*]          - Dir where s3fs tar.gz is downloaded
+#  [*version*]               - s3fs version
+#  [*download_url*]          - s3fs tar.gz download link
+#  [*aws_access_key_id*]     - aws access key id
+#  [*aws_secret_access_key*] - aws secret access key
+#  [*credentials_file*]      - File storing AWS id & key
+#
 # Actions:
 #
 # Requires:
 #
+#  Class['s3fs::dependencies'], Class['s3fs::params']
+#
 # Sample Usage:
 #
-# # S3FS
-#  s3fs::mount {'Testing':
-#    bucket      => 'testvgh1',
-#    mount_point => '/srv/testvgh1',
-#    uid         => '1001',
-#    gid         => '1001',
-#  }
-# ## S3FS
-#  s3fs::mount {'Testvgh':
-#    bucket      => 'testvgh',
-#    mount_point => '/srv/testvgh2',
-#    default_acl => 'public-read',
+#  class { 's3fs':
+#    $aws_access_key_id     => 'randomKey',
+#    $aws_secret_access_key => 'randomSecret',
 #  }
 #
 class s3fs (
   $ensure                = 'present',
   $s3fs_package          = $s3fs::params::s3fs_package,
-  $source_dir            = $s3fs::params::source_dir,
+  $download_dir          = $s3fs::params::download_dir,
   $version               = $s3fs::params::version,
   $download_url          = $s3fs::params::download_url,
   $aws_access_key_id     = hiera('aws_access_key_id'),
   $aws_secret_access_key = hiera('aws_secret_access_key'),
-  $credentials_file      = $s3fs::params::credentials_file
+  $credentials_file      = $s3fs::params::credentials_file,
+  $credentials           = inline_template("<%= aws_access_key_id %>:<%= aws_secret_access_key %>")
 ) inherits s3fs::params {
 
   Class['s3fs::dependencies'] -> Class['s3fs']
@@ -45,7 +48,6 @@ class s3fs (
   }
 */
 
-  $credentials = inline_template("<%= aws_access_key_id %>:<%= aws_secret_access_key %>")
 
   file{ 's3fs_credentials':
     ensure  => $ensure,
@@ -61,7 +63,7 @@ class s3fs (
   # Distribute s3fs source from within module to control version (could
   # also download from Google directly):
   exec { 's3fs_tar_gz':
-    command   => "curl -o ${source_dir}/s3fs-${version}.tar.gz ${download_url}/s3fs-${version}.tar.gz",
+    command   => "curl -o ${download_dir}/s3fs-${version}.tar.gz ${download_url}/s3fs-${version}.tar.gz",
     logoutput => true,
     timeout   => 300,
     path      => '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin:/usr/local/sbin',
@@ -70,9 +72,9 @@ class s3fs (
   
   # Extract s3fs source:
   exec { 's3fs_extract':
-    creates   => "${source_dir}/s3fs-${version}",
-    cwd         => "${source_dir}",
-    command   => "tar --no-same-owner -xzf ${source_dir}/s3fs-$version.tar.gz",
+    creates   => "${download_dir}/s3fs-${version}",
+    cwd         => "${download_dir}",
+    command   => "tar --no-same-owner -xzf ${download_dir}/s3fs-$version.tar.gz",
     logoutput => true,
     timeout   => 300,
     path      => '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin:/usr/local/sbin',
@@ -80,9 +82,9 @@ class s3fs (
 
   # Configure s3fs build:
   exec { 's3fs_configure':
-    creates     => "${source_dir}/s3fs-${version}/config.status",
-    cwd         => "${source_dir}/s3fs-${version}",
-    command     => "${source_dir}/s3fs-${version}/configure",
+    creates     => "${download_dir}/s3fs-${version}/config.status",
+    cwd         => "${download_dir}/s3fs-${version}",
+    command     => "${download_dir}/s3fs-${version}/configure",
     logoutput   => true,
     timeout     => 300,
     refreshonly => true,
@@ -90,8 +92,8 @@ class s3fs (
 
   # Build s3fs:
   exec { 's3fs_make':
-    creates     => "${source_dir}/s3fs-${version}/src/s3fs",
-    cwd         => "${source_dir}/s3fs-${version}",
+    creates     => "${download_dir}/s3fs-${version}/src/s3fs",
+    cwd         => "${download_dir}/s3fs-${version}",
     command     => "/usr/bin/make",
     logoutput   => true,
     timeout     => 300,
@@ -101,7 +103,7 @@ class s3fs (
   # Install s3fs
   exec { 's3fs_install':
     command     => "/usr/bin/make install",
-    cwd         => "${source_dir}/s3fs-${version}",
+    cwd         => "${download_dir}/s3fs-${version}",
     logoutput   => true,
     timeout     => 300,
     refreshonly => true,

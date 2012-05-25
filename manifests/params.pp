@@ -1,16 +1,10 @@
 class s3fs::params {
 
   $credentials_file = '/etc/passwd-s3fs'
-  $source_dir       = '/tmp'
+  $download_dir       = '/tmp'
   $download_url     = 'http://s3fs.googlecode.com/files'
 
-  # s3fs version >1.19 requires fuse > 2.8.4:
-
-  $s3fs_package = $::operatingsystem ? {
-    /(?i-mx:debian|ubuntu)/ => 's3fs',
-    default                 => fail("${::operatingsystem} not supported")
-  }
-
+  # Fail if the OS is not Ubuntu/Debian
   case $::operatingsystem {
     ubuntu, debian: {
     }
@@ -19,6 +13,12 @@ class s3fs::params {
     }
   }
 
+  $s3fs_package = $::operatingsystem ? {
+    /(?i-mx:debian|ubuntu)/ => 's3fs',
+    default                 => fail("${::operatingsystem} not supported")
+  }
+
+  # s3fs version >1.19 requires fuse > 2.8.4 which is installed on >10.10
   case $::lsbdistdescription {
     'Ubuntu 10.10': {
       $version = '1.61'
