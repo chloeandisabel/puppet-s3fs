@@ -24,16 +24,14 @@
 #    default_acl => 'public-read',
 #  }
 #
-#  $aws_access_key_id     = hiera('aws_access_key_id'),
-#  $aws_secret_access_key = hiera('aws_secret_access_key')
 class s3fs (
   $ensure                = 'present',
   $s3fs_package          = $s3fs::params::s3fs_package,
   $source_dir            = $s3fs::params::source_dir,
   $version               = $s3fs::params::version,
   $download_url          = $s3fs::params::download_url,
-  $aws_access_key_id,
-  $aws_secret_access_key
+  $aws_access_key_id     = hiera('aws_access_key_id'),
+  $aws_secret_access_key = hiera('aws_secret_access_key')
 ) inherits s3fs::params {
 
   Class['s3fs::dependencies'] -> Class['s3fs']
@@ -52,17 +50,18 @@ class s3fs (
   # also download from Google directly):
   exec { 's3fs_tar_gz':
     creates   => "${source_dir}/s3fs-${version}.tar.gz",
-    command   => "curl -o ${source_dir}/s3fs-${version}.tar.gz ${download_url}",
+    command   => "curl -o ${source_dir}/s3fs-${version}.tar.gz ${download_url}/s3fs-${version}.tar.gz",
     logoutput => true,
     timeout   => 300,
     path      => '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin:/usr/local/sbin',
-    unless    => 's3fs --version | grep ${version}'
+    unless    => 'which s3fs && s3fs --version | grep ${version}'
   }
   
   # Extract s3fs source:
   exec { 's3fs_extract':
     creates   => "${source_dir}/s3fs-${version}",
-    command   => "tar --no-same-owner -xzf /root/s3fs-$version.tar.gz --directory ${source_dir}",
+    cwd         => "${source_dir}",
+    command   => "tar --no-same-owner -xzf ${source_dir}/s3fs-$version.tar.gz",
     logoutput => true,
     timeout   => 300,
     path      => '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin:/usr/local/sbin',
@@ -72,7 +71,7 @@ class s3fs (
   exec { 's3fs_configure':
     creates     => "${source_dir}/s3fs-${version}/config.status",
     cwd         => "${source_dir}/s3fs-${version}",
-    command     => "${source_dir}/s3fs-${version}/configure --program-suffix=-${version}",
+    command     => "${source_dir}/s3fs-${version}/configure",
     logoutput   => true,
     timeout     => 300,
     refreshonly => true,
@@ -91,6 +90,7 @@ class s3fs (
   # Install s3fs
   exec { 's3fs_install':
     command     => "/usr/bin/make install",
+    cwd         => "${source_dir}/s3fs-${version}",
     logoutput   => true,
     timeout     => 300,
     refreshonly => true,

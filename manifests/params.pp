@@ -29,4 +29,3 @@ class s3fs::params {
   }
 
 }
-
