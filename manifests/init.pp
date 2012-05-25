@@ -46,17 +46,17 @@ class s3fs (
   }
 */
 
-  File['s3fs_tar_gz'] -> Exec['s3fs_extract'] ~> Exec['s3fs_configure'] ~> Exec['s3fs_make'] ~> Exec['s3fs_install']
+  Exec['s3fs_tar_gz'] ~> Exec['s3fs_extract'] ~> Exec['s3fs_configure'] ~> Exec['s3fs_make'] ~> Exec['s3fs_install']
 
   # Distribute s3fs source from within module to control version (could
   # also download from Google directly):
-  file { 's3fs_tar_gz':
-    ensure => $ensure,
-    path   => "${download_dir}/s3fs-${version}.tar.gz",
-    owner  => 'root',
-    group  => 'root',
-    mode   => '0644',
-    source => "${download_url}/s3fs-${version}.tar.gz",
+  exec { 's3fs_tar_gz':
+    creates   => "${source_dir}/s3fs-${version}.tar.gz",
+    command   => "curl -o ${source_dir}/s3fs-${version}.tar.gz ${download_url}",
+    logoutput => true,
+    timeout   => 300,
+    path      => '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin:/usr/local/sbin',
+    unless    => 's3fs --version | grep ${version}'
   }
   
   # Extract s3fs source:
@@ -66,7 +66,6 @@ class s3fs (
     logoutput => true,
     timeout   => 300,
     path      => '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin:/usr/local/sbin',
-    unless    => 's3fs --version | grep ${version}'
   }
 
   # Configure s3fs build:

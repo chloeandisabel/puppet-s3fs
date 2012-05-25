@@ -1,7 +1,7 @@
 class s3fs::params {
 
   $credentials_file = '/etc/passwd-s3fs'
-  $source_dir       = '/root'
+  $source_dir       = '/tmp'
   $download_url     = 'http://s3fs.googlecode.com/files'
 
   # s3fs version >1.19 requires fuse > 2.8.4:
