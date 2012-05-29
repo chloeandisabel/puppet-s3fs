@@ -51,14 +51,14 @@ define s3fs::mount (
   $atboot      = 'true',
   $device      = "s3fs#${bucket}",
   $fstype      = 'fuse',
-  $options     = "allow_other,uid=${s3fs::mount::uid},gid=${s3fs::mount::gid},default_acl=${s3fs::mount::default_acl},use_cache=/tmp/aws_s3_cache,url=${s3fs::mount::s3url}",
-  $remounts    = 'false'
+  $remounts    = 'false',
+  $cache       = '/tmp/aws_s3_cache'
 ) {
 
   Class['s3fs'] -> S3fs::Mount["${name}"]
 
-  notify {"uid ${name} = : ${uid}":}
-  notify {"gid ${name} = : ${gid}":}
+  # Declare this here, otherwise, uid, guid, etc.. are not initialized in the correct order.
+  $options = "allow_other,uid=${uid},gid=${gid},default_acl=${default_acl},use_cache=${cache},url=${s3url}"
 
   case $ensure {
     present, defined, unmounted, mounted: {
@@ -77,6 +77,7 @@ define s3fs::mount (
   file { $mount_point:
     ensure  => $ensure_dir,
     recurse => true,
+    force   => true,
     owner   => $owner,
     group   => $group,
     mode    => $mode,
