@@ -78,6 +78,7 @@ class s3fs (
     logoutput => true,
     timeout   => 300,
     path      => '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin:/usr/local/sbin',
+    refreshonly => true,
   }
 
   # Configure s3fs build:
