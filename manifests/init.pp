@@ -63,11 +63,11 @@ class s3fs (
   # Distribute s3fs source from within module to control version (could
   # also download from Google directly):
   exec { 's3fs_tar_gz':
-    command   => "curl -o ${download_dir}/s3fs-${version}.tar.gz ${download_url}/s3fs-${version}.tar.gz",
+    command   => "/usr/bin/curl -o ${download_dir}/s3fs-${version}.tar.gz ${download_url}/s3fs-${version}.tar.gz",
     logoutput => true,
     timeout   => 300,
-    path      => '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin:/usr/local/sbin',
-    unless    => "which s3fs && s3fs --version | grep ${version}",
+    #path      => '/sbin:/bin:/usr/local/bin:/usr/local/sbin',
+    unless    => "/usr/bin/which /usr/local/bin/s3fs && /usr/local/bin/s3fs --version | grep ${version}",
   }
   
   # Extract s3fs source:
