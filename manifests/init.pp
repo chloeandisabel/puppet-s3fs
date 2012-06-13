@@ -35,7 +35,7 @@ class s3fs (
   $aws_access_key_id     = hiera('aws_access_key_id'),
   $aws_secret_access_key = hiera('aws_secret_access_key'),
   $credentials_file      = $s3fs::params::credentials_file,
-  $credentials           = inline_template("<%= aws_access_key_id %>:<%= aws_secret_access_key %>")
+  $credentials           = inline_template("<%= aws_access_key_id %>:<%= aws_secret_access_key %>\n")
 ) inherits s3fs::params {
 
   Class['s3fs::dependencies'] -> Class['s3fs']
