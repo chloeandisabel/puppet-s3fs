@@ -11,6 +11,7 @@
 #  [*download_url*]          - s3fs tar.gz download link
 #  [*aws_access_key_id*]     - aws access key id
 #  [*aws_secret_access_key*] - aws secret access key
+#  [*credentials_file*]      - location of aws credentials file
 #
 # Actions:
 #
