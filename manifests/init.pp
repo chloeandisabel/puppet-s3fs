@@ -37,7 +37,7 @@ class s3fs (
   $credentials_file      = $s3fs::params::credentials_file
 ) inherits s3fs::params {
 
-  $credentials           = inline_template("<%= aws_access_key_id %>:<%= aws_secret_access_key %>\n")
+  $credentials = inline_template("<%= @aws_access_key_id %>:<%= @aws_secret_access_key %>\n")
 
   Class['s3fs::dependencies'] -> Class['s3fs']
   include s3fs::dependencies
